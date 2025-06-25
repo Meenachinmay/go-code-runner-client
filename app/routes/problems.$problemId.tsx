@@ -22,6 +22,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         } catch (error) {
             console.error("JSON parsing error:", error);
             console.error("Raw response:", text);
+            // @ts-expect-error - error is of unknown type from JSON.parse
             throw new Error(`Failed to parse JSON: ${error.message}`);
         }
 
@@ -73,6 +74,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         } catch (error) {
             console.error("JSON parsing error:", error);
             console.error("Raw response:", text);
+            // @ts-expect-error - error is of unknown type from JSON.parse
             throw new Error(`Failed to parse JSON: ${error.message}`);
         }
 
@@ -117,22 +119,38 @@ export default function ProblemPage() {
             </div>
 
             {/* Right side: Code Editor and Execution */}
-            <div className="w-1/2 p-8 flex flex-col">
-                <Form method="post" className="flex flex-col flex-grow">
-                    <input type="hidden" name="problemId" value={problem.id} />
-                    <CodeEditor name="code" />
-                    <div className="mt-4">
-                        <button type="submit" className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" disabled={isSubmitting}>
-                            {isSubmitting ? "Running..." : "Run Code"}
-                        </button>
+            <div className="w-1/2 p-8 flex flex-col h-full overflow-hidden">
+                <div className="flex flex-col h-full">
+                    {/* Top section: Code Editor (fixed height) */}
+                    <div className="h-[60%] mb-4">
+                        <Form method="post" className="flex flex-col h-full">
+                            <input type="hidden" name="problemId" value={problem.id} />
+
+                            {/* Editor area */}
+                            <div className="flex-1 overflow-hidden">
+                                <CodeEditor name="code" />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded self-start"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? "Running..." : "Run Code"}
+                            </button>
+                        </Form>
                     </div>
-                </Form>
-                {actionData && (
-                    <div className="mt-6">
-                        <h2 className="text-2xl font-semibold mb-4">Results</h2>
-                        <TestResultDisplay results={actionData} />
+
+                    {/* Bottom section: Test Results (scrollable) */}
+                    <div className="h-[40%] overflow-y-auto">
+                        {actionData && (
+                            <div>
+                                <h2 className="text-2xl font-semibold mb-4">Results</h2>
+                                <TestResultDisplay results={actionData} />
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

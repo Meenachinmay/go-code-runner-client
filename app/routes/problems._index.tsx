@@ -18,6 +18,7 @@ export const loader = async () => {
         } catch (error) {
             console.error("JSON parsing error:", error);
             console.error("Raw response:", text);
+            // @ts-ignore
             throw new Error(`Failed to parse JSON: ${error.message}`);
         }
 

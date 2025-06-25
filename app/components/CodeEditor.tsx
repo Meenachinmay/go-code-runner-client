@@ -17,13 +17,12 @@ export function CodeEditor({ name, defaultValue = "" }: Props) {
   }, [code]);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden rounded-lg border border-gray-700">
+    <div className="flex flex-col flex-1 h-full overflow-hidden rounded-lg border border-gray-700"> {/* ← add h-full */}
       <CodeMirror
         value={code}
         onChange={setCode}
-        /* let it fill the wrapper */
         height="100%"
-        style={{ flex: 1 }}      // <─── important
+        style={{ flex: 1 }}
         theme="dark"
         extensions={[go()]}
         basicSetup={{ lineNumbers: true, foldGutter: true }}
