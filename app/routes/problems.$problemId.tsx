@@ -23,8 +23,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         } catch (error) {
             console.error("JSON parsing error:", error);
             console.error("Raw response:", text);
-            // @ts-expect-error - error is of unknown type from JSON.parse
-            throw new Error(`Failed to parse JSON: ${error.message}`);
+            throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`);
         }
 
         return json<LoaderData>({
@@ -76,8 +75,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         } catch (error) {
             console.error("JSON parsing error:", error);
             console.error("Raw response:", text);
-            // @ts-expect-error - error is of unknown type from JSON.parse
-            throw new Error(`Failed to parse JSON: ${error.message}`);
+            throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`);
         }
 
         // The backend now returns a job_id instead of immediate results
@@ -88,7 +86,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         // Return a default error response
         return json<ExecuteResponse>({
             success: false,
-            error: `An error occurred: ${error.message}`,
+            error: `An error occurred: ${error instanceof Error ? error.message : String(error)}`,
         });
     }
 };

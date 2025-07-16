@@ -1,6 +1,10 @@
-import type { ExecuteResponse, JobStatusResponse } from "~/types";
+import type { ExecuteResponse, JobStatusResponse, TestResult } from "~/types";
 
-export function TestResultDisplay({ results }: { results: ExecuteResponse | JobStatusResponse }) {
+interface TestResultDisplayProps {
+  results: ExecuteResponse | JobStatusResponse;
+}
+
+export function TestResultDisplay({ results }: TestResultDisplayProps): JSX.Element | null {
     if (!results) {
         return null;
     }
@@ -13,9 +17,9 @@ export function TestResultDisplay({ results }: { results: ExecuteResponse | JobS
     // Handle job status messages
     if ('status' in results && results.status !== 'completed') {
         return (
-            <div className="p-4 rounded-lg mb-4 bg-yellow-800">
+            <div className="p-4 rounded-lg mb-4 bg-yellow-800" role="alert">
                 <h3 className="font-bold text-lg mb-2">Job Status: {results.status}</h3>
-                {results.message && <p>{results.message}</p>}
+                {'message' in results && results.message && <p>{results.message}</p>}
                 <p className="text-yellow-300">Please wait while your code is being processed...</p>
             </div>
         );
@@ -24,10 +28,10 @@ export function TestResultDisplay({ results }: { results: ExecuteResponse | JobS
     // Handle job submission response without test results
     if ('job_id' in results && !results.test_results) {
         return (
-            <div className="p-4 rounded-lg mb-4 bg-blue-800">
+            <div className="p-4 rounded-lg mb-4 bg-blue-800" role="alert">
                 <h3 className="font-bold text-lg mb-2">Job Submitted</h3>
                 <p>Job ID: {results.job_id}</p>
-                {results.message && <p>{results.message}</p>}
+                {'message' in results && results.message && <p>{results.message}</p>}
                 <p className="text-blue-300">Your code has been submitted for execution.</p>
             </div>
         );
@@ -37,8 +41,13 @@ export function TestResultDisplay({ results }: { results: ExecuteResponse | JobS
     if (results.test_results && results.test_results.length > 0) {
         return (
             <div>
-                {results.test_results.map((result, index) => (
-                    <div key={index} className={`p-4 rounded-lg mb-4 ${result.passed ? 'bg-green-800' : 'bg-red-800'}`}>
+                {results.test_results.map((result: TestResult, index: number) => (
+                    <div 
+                        key={`test-result-${index}`} 
+                        className={`p-4 rounded-lg mb-4 ${result.passed ? 'bg-green-800' : 'bg-red-800'}`}
+                        role="region"
+                        aria-label={`Test case ${result.test_case_id} result`}
+                    >
                         <h3 className="font-bold text-lg mb-2">Test Case #{result.test_case_id}</h3>
                         <p className={`font-semibold ${result.passed ? 'text-green-300' : 'text-red-300'}`}>
                             {result.passed ? 'Passed' : 'Failed'}
@@ -57,7 +66,7 @@ export function TestResultDisplay({ results }: { results: ExecuteResponse | JobS
 
     // Fallback for empty or unexpected response
     return (
-        <div className="p-4 rounded-lg mb-4 bg-gray-800">
+        <div className="p-4 rounded-lg mb-4 bg-gray-800" role="alert">
             <p>No results available.</p>
         </div>
     );
