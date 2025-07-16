@@ -31,9 +31,27 @@ export interface ExecutionResults {
     test_results: TestResult[];
 }
 
+export interface JobSubmissionResponse {
+    success: boolean;
+    job_id: string;
+    message: string;
+    error?: string;
+}
+
+export interface JobStatusResponse {
+    job_id: string;
+    status: "pending" | "processing" | "completed" | "failed";
+    success: boolean;
+    test_results?: TestResult[];
+    error?: string;
+}
+
 export interface ExecuteResponse {
     success: boolean;
     output?: string;
     error?: string;
     test_results?: TestResult[];
+    job_id?: string;
+    message?: string;
+    status?: "pending" | "processing" | "completed" | "failed";
 }
